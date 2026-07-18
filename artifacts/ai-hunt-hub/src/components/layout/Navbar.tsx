@@ -1,92 +1,156 @@
-import { Link } from "wouter";
-import { Search, Menu, UserCircle, Plus } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { Search, UserCircle, Plus, Sparkles, Menu, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "@/components/theme-provider";
-import { Moon, Sun } from "lucide-react";
 import { Show, useClerk, useUser } from "@clerk/react";
+import { useState } from "react";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
   const { user } = useUser();
   const { signOut } = useClerk();
+  const [, setLocation] = useLocation();
+  const [search, setSearch] = useState("");
+
+  const handleSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && e.currentTarget.value.trim()) {
+      setLocation(`/browse?search=${encodeURIComponent(e.currentTarget.value.trim())}`);
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header
+      className="sticky top-0 z-50 w-full border-b"
+      style={{
+        background: "rgba(5, 10, 24, 0.85)",
+        backdropFilter: "blur(20px)",
+        borderColor: "rgba(255,255,255,0.07)",
+      }}
+    >
       <div className="container mx-auto h-16 flex items-center justify-between px-4 md:px-8">
+        {/* Logo */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <img src={`${basePath}/logo.svg`} alt="AI Hunt Hub Logo" className="h-8" />
+          <Link href="/" className="flex items-center gap-2 group">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)", boxShadow: "0 0 16px rgba(99,102,241,0.4)" }}
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-white text-base tracking-tight hidden sm:block">AI Hunt Hub</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="/browse" className="text-muted-foreground hover:text-foreground transition-colors">Browse</Link>
-            <Link href="/categories" className="text-muted-foreground hover:text-foreground transition-colors">Categories</Link>
-            <Link href="/trending" className="text-muted-foreground hover:text-foreground transition-colors">Trending</Link>
-            <Link href="/new" className="text-muted-foreground hover:text-foreground transition-colors">New</Link>
+          <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
+            {[
+              { label: "Browse", href: "/browse" },
+              { label: "Categories", href: "/categories" },
+              { label: "Trending", href: "/trending" },
+              { label: "New", href: "/new" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="transition-colors"
+                style={{ color: "rgb(148 163 184)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgb(148 163 184)")}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:flex relative w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+        {/* Right side */}
+        <div className="flex items-center gap-3">
+          {/* Search — lg+ */}
+          <div className="hidden lg:flex relative w-56">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 pointer-events-none" style={{ color: "rgb(100 116 139)" }} />
+            <input
               type="search"
               placeholder="Search tools..."
-              className="pl-9 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary h-9"
-              onChange={(e) => {
-                if (e.target.value && e.key === 'Enter') {
-                  window.location.href = `${basePath}/browse?search=${encodeURIComponent(e.target.value)}`;
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  window.location.href = `${basePath}/browse?search=${encodeURIComponent(e.currentTarget.value)}`;
-                }
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={handleSearchKey}
+              className="w-full pl-9 pr-3 h-9 rounded-lg text-sm outline-none"
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "white",
               }}
             />
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
+          {/* Theme toggle */}
+          <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="text-muted-foreground"
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+            style={{ color: "rgb(100 116 139)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "white")}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgb(100 116 139)")}
           >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
 
+          {/* Submit Tool */}
           <Link href="/submit" className="hidden sm:inline-flex">
-            <Button size="sm" className="gap-2">
-              <Plus className="h-4 w-4" />
+            <button
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white"
+              style={{
+                background: "linear-gradient(135deg, #6366f1, #818cf8)",
+                boxShadow: "0 0 16px rgba(99,102,241,0.35)",
+              }}
+            >
+              <Plus className="h-3.5 w-3.5" />
               Submit Tool
-            </Button>
+            </button>
           </Link>
 
+          {/* Auth */}
           <Show when="signed-out">
             <Link href="/sign-in" className="hidden sm:inline-flex">
-              <Button variant="outline" size="sm">Sign In</Button>
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                style={{ color: "rgb(148 163 184)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgb(148 163 184)")}
+              >
+                Sign In
+              </button>
             </Link>
           </Show>
-          
+
           <Show when="signed-in">
             <div className="flex items-center gap-2">
               <Link href="/profile">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex gap-2">
+                <button
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors"
+                  style={{ color: "rgb(148 163 184)" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgb(148 163 184)")}
+                >
                   <UserCircle className="h-4 w-4" />
-                  Profile
-                </Button>
+                  {user?.firstName || "Profile"}
+                </button>
               </Link>
-              <Button variant="ghost" size="sm" onClick={() => signOut({ redirectUrl: basePath || "/" })} className="hidden sm:inline-flex">
+              <button
+                onClick={() => signOut({ redirectUrl: basePath || "/" })}
+                className="hidden sm:flex px-3 py-2 rounded-lg text-sm transition-colors"
+                style={{ color: "rgb(100 116 139)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "white")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgb(100 116 139)")}
+              >
                 Log Out
-              </Button>
+              </button>
             </div>
           </Show>
 
-          <Button variant="ghost" size="icon" className="md:hidden">
+          {/* Mobile menu */}
+          <button className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg" style={{ color: "rgb(148 163 184)" }}>
             <Menu className="h-5 w-5" />
-          </Button>
+          </button>
         </div>
       </div>
     </header>

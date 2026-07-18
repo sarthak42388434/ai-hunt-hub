@@ -104,7 +104,7 @@ function Router() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="ai-hunt-hub-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="ai-hunt-hub-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <WouterRouter base={basePath}>
