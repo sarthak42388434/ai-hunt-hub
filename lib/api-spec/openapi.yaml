@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AI Hunt Hub API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: tools
+  - name: categories
+  - name: tags
+  - name: reviews
+  - name: bookmarks
+  - name: blog
+  - name: news
+  - name: newsletter
+  - name: users
+  - name: admin
+  - name: home
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +32,1457 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /home:
+    get:
+      operationId: getHomeData
+      tags: [home]
+      summary: Homepage aggregated data
+      responses:
+        "200":
+          description: Home data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeData"
+
+  /tools:
+    get:
+      operationId: listTools
+      tags: [tools]
+      summary: List and search tools
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: pricing
+          in: query
+          schema: { type: string, enum: [free, freemium, paid, contact] }
+        - name: platform
+          in: query
+          schema: { type: string }
+        - name: rating
+          in: query
+          schema: { type: number }
+        - name: tag
+          in: query
+          schema: { type: string }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [newest, popular, rating, alphabetical] }
+        - name: verified
+          in: query
+          schema: { type: boolean }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Paginated tools list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedTools"
+
+    post:
+      operationId: submitTool
+      tags: [tools]
+      summary: Submit a new tool (pending review)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToolInput"
+      responses:
+        "201":
+          description: Tool submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tool"
+
+  /tools/featured:
+    get:
+      operationId: getFeaturedTools
+      tags: [tools]
+      summary: Get featured tools
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 8 }
+      responses:
+        "200":
+          description: Featured tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/trending:
+    get:
+      operationId: getTrendingTools
+      tags: [tools]
+      summary: Get trending tools
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        "200":
+          description: Trending tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/newest:
+    get:
+      operationId: getNewestTools
+      tags: [tools]
+      summary: Get newest tools added today or this week
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 12 }
+      responses:
+        "200":
+          description: Newest tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/free:
+    get:
+      operationId: getFreeTools
+      tags: [tools]
+      summary: Get free tools
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 12 }
+      responses:
+        "200":
+          description: Free tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/editors-choice:
+    get:
+      operationId: getEditorsChoiceTools
+      tags: [tools]
+      summary: Get editor's choice tools
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 6 }
+      responses:
+        "200":
+          description: Editor's choice tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/compare:
+    get:
+      operationId: compareTools
+      tags: [tools]
+      summary: Compare up to 3 tools
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated tool IDs
+      responses:
+        "200":
+          description: Tools for comparison
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/{id}:
+    get:
+      operationId: getTool
+      tags: [tools]
+      summary: Get tool by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tool detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tool"
+        "404":
+          description: Not found
+
+    patch:
+      operationId: updateTool
+      tags: [tools]
+      summary: Update a tool (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToolUpdate"
+      responses:
+        "200":
+          description: Updated tool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tool"
+
+    delete:
+      operationId: deleteTool
+      tags: [tools]
+      summary: Delete a tool (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /tools/{id}/related:
+    get:
+      operationId: getRelatedTools
+      tags: [tools]
+      summary: Get related tools
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Related tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/{id}/view:
+    post:
+      operationId: recordToolView
+      tags: [tools]
+      summary: Record a tool view
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Recorded
+
+  /tools/{id}/click:
+    post:
+      operationId: recordToolClick
+      tags: [tools]
+      summary: Record a tool click (visit website)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Recorded
+
+  /tools/{id}/report:
+    post:
+      operationId: reportTool
+      tags: [tools]
+      summary: Report a tool
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportInput"
+      responses:
+        "201":
+          description: Report submitted
+
+  /tools/{toolId}/reviews:
+    get:
+      operationId: listReviews
+      tags: [reviews]
+      summary: List reviews for a tool
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedReviews"
+
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Create a review
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /reviews/{id}:
+    patch:
+      operationId: updateReview
+      tags: [reviews]
+      summary: Update a review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewUpdate"
+      responses:
+        "200":
+          description: Updated review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+    delete:
+      operationId: deleteReview
+      tags: [reviews]
+      summary: Delete a review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create a category (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+  /categories/{id}:
+    patch:
+      operationId: updateCategory
+      tags: [categories]
+      summary: Update a category (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      summary: Delete a category (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /tags:
+    get:
+      operationId: listTags
+      tags: [tags]
+      summary: List all tags
+      responses:
+        "200":
+          description: Tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tag"
+
+  /bookmarks:
+    get:
+      operationId: listBookmarks
+      tags: [bookmarks]
+      summary: Get current user's bookmarks
+      responses:
+        "200":
+          description: Bookmarks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bookmark"
+
+    post:
+      operationId: addBookmark
+      tags: [bookmarks]
+      summary: Add a bookmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookmarkInput"
+      responses:
+        "201":
+          description: Bookmarked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+
+  /bookmarks/{toolId}:
+    delete:
+      operationId: removeBookmark
+      tags: [bookmarks]
+      summary: Remove a bookmark
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Removed
+
+  /bookmarks/check/{toolId}:
+    get:
+      operationId: checkBookmark
+      tags: [bookmarks]
+      summary: Check if a tool is bookmarked
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Bookmark status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookmarkStatus"
+
+  /blog:
+    get:
+      operationId: listBlogPosts
+      tags: [blog]
+      summary: List blog posts
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        "200":
+          description: Blog posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBlogPosts"
+
+    post:
+      operationId: createBlogPost
+      tags: [blog]
+      summary: Create a blog post (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+
+  /blog/{slug}:
+    get:
+      operationId: getBlogPost
+      tags: [blog]
+      summary: Get a blog post by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Blog post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+        "404":
+          description: Not found
+
+  /blog/id/{id}:
+    patch:
+      operationId: updateBlogPost
+      tags: [blog]
+      summary: Update a blog post (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+
+    delete:
+      operationId: deleteBlogPost
+      tags: [blog]
+      summary: Delete a blog post (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /news:
+    get:
+      operationId: listNews
+      tags: [news]
+      summary: List news articles
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: trending
+          in: query
+          schema: { type: boolean }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+      responses:
+        "200":
+          description: News articles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedNews"
+
+    post:
+      operationId: createNews
+      tags: [news]
+      summary: Create a news article (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsArticle"
+
+  /news/{slug}:
+    get:
+      operationId: getNewsArticle
+      tags: [news]
+      summary: Get a news article by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: News article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsArticle"
+
+  /news/id/{id}:
+    patch:
+      operationId: updateNews
+      tags: [news]
+      summary: Update a news article (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsArticle"
+
+  /newsletter/subscribe:
+    post:
+      operationId: subscribeNewsletter
+      tags: [newsletter]
+      summary: Subscribe to newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterInput"
+      responses:
+        "201":
+          description: Subscribed
+
+  /users/me:
+    get:
+      operationId: getMyProfile
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+    patch:
+      operationId: updateMyProfile
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/me/submitted-tools:
+    get:
+      operationId: getMySubmittedTools
+      tags: [users]
+      summary: Get tools submitted by the current user
+      responses:
+        "200":
+          description: Submitted tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Admin dashboard stats
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/tools:
+    get:
+      operationId: adminListTools
+      tags: [admin]
+      summary: Admin list all tools with any status
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [pending, approved, rejected, featured] }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Tools
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedTools"
+
+  /admin/tools/{id}/status:
+    patch:
+      operationId: updateToolStatus
+      tags: [admin]
+      summary: Update tool status (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ToolStatusUpdate"
+      responses:
+        "200":
+          description: Updated tool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tool"
+
+  /admin/users:
+    get:
+      operationId: adminListUsers
+      tags: [admin]
+      summary: Admin list users
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsers"
+
+  /admin/reports:
+    get:
+      operationId: adminListReports
+      tags: [admin]
+      summary: Admin list reports
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [open, resolved, dismissed] }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedReports"
+
+  /admin/reports/{id}/status:
+    patch:
+      operationId: updateReportStatus
+      tags: [admin]
+      summary: Update report status (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportStatusUpdate"
+      responses:
+        "200":
+          description: Updated report
+
+  /admin/newsletter:
+    get:
+      operationId: adminListSubscribers
+      tags: [admin]
+      summary: Admin list newsletter subscribers
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          description: Subscribers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSubscribers"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Tool:
+      type: object
+      required: [id, name, slug, websiteUrl, shortDescription, pricing, status, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        websiteUrl: { type: string }
+        shortDescription: { type: string }
+        longDescription: { type: ["string", "null"] }
+        logoUrl: { type: ["string", "null"] }
+        bannerUrl: { type: ["string", "null"] }
+        demoVideoUrl: { type: ["string", "null"] }
+        categoryId: { type: ["integer", "null"] }
+        categoryName: { type: ["string", "null"] }
+        categorySlug: { type: ["string", "null"] }
+        pricing: { type: string, enum: [free, freemium, paid, contact] }
+        status: { type: string, enum: [pending, approved, rejected, featured] }
+        isVerified: { type: boolean }
+        isEditorChoice: { type: boolean }
+        views: { type: integer }
+        clicks: { type: integer }
+        bookmarkCount: { type: integer }
+        ratingAvg: { type: number }
+        reviewCount: { type: integer }
+        ownerName: { type: ["string", "null"] }
+        contactEmail: { type: ["string", "null"] }
+        supportUrl: { type: ["string", "null"] }
+        documentationUrl: { type: ["string", "null"] }
+        githubUrl: { type: ["string", "null"] }
+        launchDate: { type: ["string", "null"] }
+        aiModel: { type: ["string", "null"] }
+        features: { type: array, items: { type: string } }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+        platforms: { type: array, items: { type: string } }
+        integrations: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        screenshots: { type: array, items: { type: string } }
+        socialLinks: { type: object, additionalProperties: { type: string } }
+        submittedBy: { type: ["string", "null"] }
+        trendingScore: { type: number }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+
+    ToolInput:
+      type: object
+      required: [name, websiteUrl, shortDescription, pricing]
+      properties:
+        name: { type: string }
+        websiteUrl: { type: string }
+        shortDescription: { type: string }
+        longDescription: { type: string }
+        logoUrl: { type: string }
+        bannerUrl: { type: string }
+        demoVideoUrl: { type: string }
+        categoryId: { type: integer }
+        pricing: { type: string, enum: [free, freemium, paid, contact] }
+        aiModel: { type: string }
+        features: { type: array, items: { type: string } }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+        platforms: { type: array, items: { type: string } }
+        integrations: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        screenshots: { type: array, items: { type: string } }
+        socialLinks: { type: object, additionalProperties: { type: string } }
+        ownerName: { type: string }
+        contactEmail: { type: string }
+        supportUrl: { type: string }
+        documentationUrl: { type: string }
+        githubUrl: { type: string }
+        launchDate: { type: string }
+
+    ToolUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        websiteUrl: { type: string }
+        shortDescription: { type: string }
+        longDescription: { type: string }
+        logoUrl: { type: string }
+        bannerUrl: { type: string }
+        demoVideoUrl: { type: string }
+        categoryId: { type: integer }
+        pricing: { type: string, enum: [free, freemium, paid, contact] }
+        isVerified: { type: boolean }
+        isEditorChoice: { type: boolean }
+        aiModel: { type: string }
+        features: { type: array, items: { type: string } }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+        platforms: { type: array, items: { type: string } }
+        integrations: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        screenshots: { type: array, items: { type: string } }
+        socialLinks: { type: object, additionalProperties: { type: string } }
+        ownerName: { type: string }
+        contactEmail: { type: string }
+        supportUrl: { type: string }
+        documentationUrl: { type: string }
+        githubUrl: { type: string }
+        launchDate: { type: string }
+
+    ToolStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [pending, approved, rejected, featured] }
+        isVerified: { type: boolean }
+        isEditorChoice: { type: boolean }
+
+    PaginatedTools:
+      type: object
+      required: [tools, total, page, limit]
+      properties:
+        tools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    Category:
+      type: object
+      required: [id, name, slug, toolCount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        description: { type: ["string", "null"] }
+        icon: { type: ["string", "null"] }
+        toolCount: { type: integer }
+
+    CategoryInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        icon: { type: string }
+
+    CategoryUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        icon: { type: string }
+
+    Tag:
+      type: object
+      required: [id, name, slug, toolCount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        toolCount: { type: integer }
+
+    Review:
+      type: object
+      required: [id, toolId, rating, createdAt]
+      properties:
+        id: { type: integer }
+        toolId: { type: integer }
+        userId: { type: ["string", "null"] }
+        userName: { type: ["string", "null"] }
+        userAvatar: { type: ["string", "null"] }
+        rating: { type: integer }
+        title: { type: ["string", "null"] }
+        content: { type: ["string", "null"] }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+
+    ReviewInput:
+      type: object
+      required: [rating]
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        title: { type: string }
+        content: { type: string }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+
+    ReviewUpdate:
+      type: object
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        title: { type: string }
+        content: { type: string }
+        pros: { type: array, items: { type: string } }
+        cons: { type: array, items: { type: string } }
+
+    PaginatedReviews:
+      type: object
+      required: [reviews, total, page, limit]
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    Bookmark:
+      type: object
+      required: [id, toolId, createdAt]
+      properties:
+        id: { type: integer }
+        toolId: { type: integer }
+        userId: { type: string }
+        tool:
+          $ref: "#/components/schemas/Tool"
+        createdAt: { type: string }
+
+    BookmarkInput:
+      type: object
+      required: [toolId]
+      properties:
+        toolId: { type: integer }
+
+    BookmarkStatus:
+      type: object
+      required: [bookmarked]
+      properties:
+        bookmarked: { type: boolean }
+
+    BlogPost:
+      type: object
+      required: [id, title, slug, excerpt, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: ["string", "null"] }
+        authorName: { type: ["string", "null"] }
+        authorAvatar: { type: ["string", "null"] }
+        category: { type: ["string", "null"] }
+        tags: { type: array, items: { type: string } }
+        readingTime: { type: integer }
+        coverImage: { type: ["string", "null"] }
+        status: { type: string, enum: [draft, published] }
+        publishedAt: { type: ["string", "null"] }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+
+    BlogPostInput:
+      type: object
+      required: [title, slug, excerpt]
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: string }
+        authorName: { type: string }
+        authorAvatar: { type: string }
+        category: { type: string }
+        tags: { type: array, items: { type: string } }
+        coverImage: { type: string }
+        status: { type: string, enum: [draft, published] }
+
+    BlogPostUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: string }
+        authorName: { type: string }
+        authorAvatar: { type: string }
+        category: { type: string }
+        tags: { type: array, items: { type: string } }
+        coverImage: { type: string }
+        status: { type: string, enum: [draft, published] }
+
+    PaginatedBlogPosts:
+      type: object
+      required: [posts, total, page, limit]
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlogPost"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    NewsArticle:
+      type: object
+      required: [id, title, slug, excerpt, publishedAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: ["string", "null"] }
+        sourceUrl: { type: ["string", "null"] }
+        category: { type: ["string", "null"] }
+        coverImage: { type: ["string", "null"] }
+        isTrending: { type: boolean }
+        publishedAt: { type: string }
+        createdAt: { type: string }
+
+    NewsInput:
+      type: object
+      required: [title, slug, excerpt, publishedAt]
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        excerpt: { type: string }
+        content: { type: string }
+        sourceUrl: { type: string }
+        category: { type: string }
+        coverImage: { type: string }
+        isTrending: { type: boolean }
+        publishedAt: { type: string }
+
+    NewsUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        excerpt: { type: string }
+        content: { type: string }
+        sourceUrl: { type: string }
+        category: { type: string }
+        coverImage: { type: string }
+        isTrending: { type: boolean }
+
+    PaginatedNews:
+      type: object
+      required: [articles, total, page, limit]
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsArticle"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    NewsletterInput:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string }
+
+    ReportInput:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string }
+        details: { type: string }
+
+    UserProfile:
+      type: object
+      required: [id, clerkUserId, createdAt]
+      properties:
+        id: { type: integer }
+        clerkUserId: { type: string }
+        email: { type: ["string", "null"] }
+        name: { type: ["string", "null"] }
+        avatarUrl: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        role: { type: string, enum: [user, admin] }
+        createdAt: { type: string }
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+
+    AdminStats:
+      type: object
+      required: [totalTools, pendingTools, approvedTools, rejectedTools, featuredTools, totalUsers, totalReviews, totalBookmarks, totalSubscribers, recentTools]
+      properties:
+        totalTools: { type: integer }
+        pendingTools: { type: integer }
+        approvedTools: { type: integer }
+        rejectedTools: { type: integer }
+        featuredTools: { type: integer }
+        totalUsers: { type: integer }
+        totalReviews: { type: integer }
+        totalBookmarks: { type: integer }
+        totalSubscribers: { type: integer }
+        recentTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+
+    HomeData:
+      type: object
+      required: [featuredTools, trendingTools, newestTools, topRatedTools, freeTools, editorsChoice, categories, recentBlogPosts, recentNews, stats]
+      properties:
+        featuredTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        trendingTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        newestTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        topRatedTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        freeTools:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        editorsChoice:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tool"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        recentBlogPosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlogPost"
+        recentNews:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsArticle"
+        stats:
+          $ref: "#/components/schemas/SiteStats"
+
+    SiteStats:
+      type: object
+      required: [totalTools, totalCategories, totalUsers, totalReviews]
+      properties:
+        totalTools: { type: integer }
+        totalCategories: { type: integer }
+        totalUsers: { type: integer }
+        totalReviews: { type: integer }
+
+    PaginatedUsers:
+      type: object
+      required: [users, total, page, limit]
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    Report:
+      type: object
+      required: [id, toolId, reason, status, createdAt]
+      properties:
+        id: { type: integer }
+        toolId: { type: integer }
+        reporterId: { type: ["string", "null"] }
+        reason: { type: string }
+        details: { type: ["string", "null"] }
+        status: { type: string, enum: [open, resolved, dismissed] }
+        createdAt: { type: string }
+        tool:
+          $ref: "#/components/schemas/Tool"
+
+    ReportStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [open, resolved, dismissed] }
+
+    PaginatedReports:
+      type: object
+      required: [reports, total, page, limit]
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/Report"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    NewsletterSubscriber:
+      type: object
+      required: [id, email, subscribedAt]
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        subscribedAt: { type: string }
+
+    PaginatedSubscribers:
+      type: object
+      required: [subscribers, total, page, limit]
+      properties:
+        subscribers:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsletterSubscriber"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }

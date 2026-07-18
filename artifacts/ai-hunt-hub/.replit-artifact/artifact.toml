@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "AI Hunt Hub"
+version = "1.0.0"
+id = "artifacts/ai-hunt-hub"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22997
+
+[services.development]
+run = "pnpm --filter @workspace/ai-hunt-hub run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-hunt-hub", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-hunt-hub/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22997"
+BASE_PATH = "/"
