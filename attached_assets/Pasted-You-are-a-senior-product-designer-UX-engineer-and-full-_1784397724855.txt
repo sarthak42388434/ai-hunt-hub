@@ -1,0 +1,500 @@
+You are a senior product designer, UX engineer, and full-stack developer.
+
+I want you to transform my existing AI Hunt Hub application into a premium, futuristic 3D AI discovery platform.
+
+IMPORTANT:
+- Do NOT destroy existing functionality.
+- Keep Clerk authentication working.
+- Keep Supabase/database integration working.
+- Keep existing API structure unless improvements are required.
+- First analyze the entire project structure, current UI, components, database, and API before making changes.
+- Fix existing bugs before adding new features.
+- Make production-quality changes only.
+
+The goal:
+Create a website experience comparable to:
+- Linear
+- Vercel
+- Apple Vision Pro website
+- Product Hunt
+- Framer
+- Notion AI
+
+The website should feel premium, modern, fast, and futuristic.
+
+==================================================
+PHASE 1 — STABILITY AND CODE QUALITY
+==================================================
+
+Before redesigning:
+
+1. Inspect the entire frontend and backend.
+
+2. Fix all current issues:
+- TypeScript errors
+- Runtime errors
+- API response mismatches
+- Loading failures
+- Broken routes
+- Authentication issues
+- Empty states
+- Error handling
+
+3. Verify:
+- Clerk login/signup works
+- Profile page works
+- Submit Tool page works
+- Tool listing works
+- Admin dashboard works
+- User data loads correctly
+- Database queries work correctly
+
+4. Improve architecture:
+- Remove duplicate code
+- Create reusable components
+- Improve API handling
+- Add proper loading states
+- Add proper error boundaries
+
+
+==================================================
+PHASE 2 — PREMIUM 3D DESIGN SYSTEM
+==================================================
+
+Redesign the entire UI.
+
+Create a futuristic AI-themed design system.
+
+Style:
+
+- Dark premium background
+- Glassmorphism cards
+- 3D floating elements
+- Smooth animations
+- Depth effects
+- Soft shadows
+- Modern gradients
+- Premium typography
+
+Design inspiration:
+
+- Apple Vision Pro
+- Linear
+- Vercel
+- Stripe
+- Arc Browser
+
+
+Use:
+
+- Three.js / React Three Fiber where appropriate
+- Framer Motion animations
+- Smooth scrolling
+- Parallax effects
+- Micro-interactions
+
+
+Do NOT overload the page with effects.
+The design must remain fast and professional.
+
+
+==================================================
+PHASE 3 — PREMIUM LANDING PAGE
+==================================================
+
+Create a world-class homepage.
+
+Hero section:
+
+Large headline:
+
+"Discover The Future Of AI Tools"
+
+Subheadline:
+
+"Explore, compare, and discover thousands of AI tools built for creators, developers, businesses, and innovators."
+
+Buttons:
+
+Primary:
+"Explore AI Tools"
+
+Secondary:
+"Submit Your AI Tool"
+
+
+Add:
+
+- 3D rotating AI ecosystem visualization
+- Floating AI tool cards
+- Animated particles
+- AI network connections
+- Floating glass panels
+
+
+Hero animation:
+
+Create a 3D AI universe:
+
+Center:
+AI brain/core
+
+Around it:
+Floating AI categories:
+
+- Writing AI
+- Image AI
+- Video AI
+- Coding AI
+- Marketing AI
+- Productivity AI
+
+
+==================================================
+PHASE 4 — AI TOOL MARKETPLACE
+==================================================
+
+Transform tool discovery into a premium marketplace.
+
+Create:
+
+Advanced search:
+
+"Search thousands of AI tools..."
+
+AI-powered search:
+
+Users can type:
+
+"I need an AI that creates YouTube videos"
+
+and receive relevant tools.
+
+
+Add filters:
+
+Category:
+- Writing
+- Video
+- Image
+- Audio
+- Coding
+- Marketing
+- Education
+- Productivity
+
+
+Pricing:
+
+- Free
+- Freemium
+- Paid
+
+
+Sorting:
+
+- Trending
+- Most Popular
+- Newest
+- Highest Rated
+
+
+==================================================
+PHASE 5 — PREMIUM TOOL CARDS
+==================================================
+
+Redesign every AI tool card.
+
+Each card should include:
+
+- Tool logo
+- Tool name
+- Description
+- Category badges
+- Rating
+- Reviews
+- Pricing
+- Trending badge
+- Verified badge
+
+
+Card design:
+
+- Glass effect
+- Hover 3D tilt
+- Smooth animation
+- Expand interaction
+
+
+Example:
+
+AI Tool Card:
+
+---------------------
+
+Logo
+
+ChatGPT Alternative
+
+★★★★★ 4.9
+
+AI Writing Assistant
+
+Tags:
+Writing
+Productivity
+
+🔥 Trending
+
+Free Plan Available
+
+
+[Visit Tool]
+
+---------------------
+
+
+==================================================
+PHASE 6 — USER PROFILES
+==================================================
+
+Create premium user profiles.
+
+Profile should show:
+
+Username
+
+Avatar
+
+AI Explorer level
+
+Achievements:
+
+🏆 Top Contributor
+
+🔥 Early Adopter
+
+⭐ AI Expert
+
+
+Statistics:
+
+Tools Submitted
+
+Reviews Written
+
+Saved Tools
+
+Collections
+
+
+Create profile dashboard:
+
+- Activity timeline
+- Saved tools
+- Submitted tools
+- Reviews
+
+
+==================================================
+PHASE 7 — COMMUNITY FEATURES
+==================================================
+
+Add:
+
+Reviews:
+
+Users can rate AI tools.
+
+Comments:
+
+Users discuss tools.
+
+Collections:
+
+Users create:
+
+"My AI Startup Stack"
+
+"My Productivity AI Tools"
+
+"My Creator Toolkit"
+
+
+Follow system:
+
+Users can follow AI explorers.
+
+
+==================================================
+PHASE 8 — ADMIN DASHBOARD
+==================================================
+
+Create a premium admin dashboard.
+
+Include:
+
+Analytics:
+
+Users:
+Total users
+New users
+Active users
+
+
+Tools:
+Total tools
+Pending approvals
+Trending tools
+
+
+Reviews:
+Total reviews
+
+
+Charts:
+
+- User growth
+- Tool growth
+- Category trends
+
+
+Admin features:
+
+- Approve tools
+- Edit tools
+- Remove tools
+- Manage users
+- Feature tools
+
+
+==================================================
+PHASE 9 — AI FEATURES
+==================================================
+
+Add AI-powered features.
+
+1. AI Tool Recommendation Engine
+
+
+Example:
+
+User:
+
+"I need AI for making product videos"
+
+
+AI:
+
+Recommended:
+
+1. Runway
+2. Pika
+3. Synthesia
+
+
+Explain why each tool is recommended.
+
+
+2. AI Assistant chatbot:
+
+Add floating AI assistant.
+
+Features:
+
+- Search tools
+- Recommend tools
+- Answer questions
+- Compare tools
+
+
+==================================================
+PHASE 10 — SEO AND GROWTH
+==================================================
+
+Optimize for search engines.
+
+Create SEO pages:
+
+/ai-writing-tools
+
+/ai-video-tools
+
+/free-ai-tools
+
+/best-ai-tools
+
+/chatgpt-alternatives
+
+
+Add:
+
+- Meta titles
+- Meta descriptions
+- Structured data
+- Sitemap
+- Fast loading
+
+
+==================================================
+PHASE 11 — PERFORMANCE
+==================================================
+
+Make the website extremely fast.
+
+Implement:
+
+- Lazy loading
+- Image optimization
+- Code splitting
+- API caching
+- Skeleton loaders
+- Pagination/infinite scrolling
+
+
+Target:
+
+Fast first load.
+
+Smooth animations.
+
+No lag.
+
+
+==================================================
+PHASE 12 — BRANDING
+==================================================
+
+Create premium branding.
+
+Add:
+
+- Modern logo
+- Favicon
+- Professional color system
+- Dark mode
+- Light mode
+
+
+Brand feeling:
+
+"The world's operating system for AI discovery"
+
+
+==================================================
+FINAL REQUIREMENTS
+==================================================
+
+Before finishing:
+
+1. Test every page.
+2. Fix all console errors.
+3. Fix all broken API calls.
+4. Verify authentication.
+5. Verify mobile responsiveness.
+6. Verify deployment compatibility.
+7. Provide a complete list of changed files.
+8. Explain every major improvement.
+
+Do not rush.
+Build this like a startup-ready premium SaaS product.
