@@ -1,38 +1,30 @@
 ---
-name: AI Hunt Hub stack
-description: Architecture decisions, fixed bugs, and non-obvious constraints for the AI Hunt Hub project.
+name: AI Hunt Hub Stack
+description: Architecture overview for the AI Hunt Hub app — routes, auth, DB, codegen, seeding
 ---
 
-## Architecture
+# AI Hunt Hub Architecture
 
-- **API server**: `artifacts/api-server` — Express 5, Clerk middleware (`@clerk/express`), routes in `src/routes/`, Drizzle ORM queries.
-- **Frontend**: `artifacts/ai-hunt-hub` — React 19 + Vite, `@clerk/react`, Orval-generated hooks from `@workspace/api-client-react`, wouter routing with `base={basePath}`.
-- **DB**: Replit-managed Postgres. Schema in `lib/db/src/schema/`. Push with `pnpm --filter @workspace/db run push`.
-- **API client**: `lib/api-client-react` — Orval-generated hooks. Re-run codegen after every spec change: `pnpm --filter @workspace/api-spec run codegen`.
-- **Zod schemas**: `lib/api-zod` — used by api-server routes for validation.
+## Monorepo layout
+- `artifacts/api-server` — Express 5 + Clerk + Drizzle ORM + Pino logging
+- `artifacts/ai-hunt-hub` — React 19 + Vite + Clerk + TanStack Query + Tailwind v4 + framer-motion
+- `lib/db` — Drizzle schema (users, tools, categories, tags, reviews, bookmarks, blog_posts, news, newsletter, reports)
+- `lib/api-spec` — OpenAPI spec + orval codegen → `lib/api-client-react` + `lib/api-zod`
 
-## Fixed Bugs
+## Key commands
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate React Query hooks from OpenAPI
+- `pnpm --filter @workspace/db run push` — push schema to Postgres
+- Seeds run via `executeSql` directly (no seed script in workspace)
 
-1. **Duplicate `export *` in barrel files** — `lib/api-client-react/src/index.ts` and `lib/api-zod/src/index.ts` had each of their `export *` lines duplicated, causing TS2308 compile errors. Fixed by removing the duplicate lines.
-2. **Missing Clerk secrets** — Clerk was `not_configured`; fixed by calling `setupClerkWhitelabelAuth()` to provision `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `VITE_CLERK_PUBLISHABLE_KEY`.
-3. **Skeleton workspace** — the workspace only had a health-check skeleton; the full project (all routes, DB schema, frontend pages, components, generated client) was copied from the GitHub repo at `/tmp/ai-hunt-hub-full`.
+## Auth
+- Replit-managed Clerk (provisioned via setupClerkWhitelabelAuth)
+- API uses `@clerk/express` clerkMiddleware + custom requireAuth/requireAdmin helpers
+- Frontend uses `@clerk/react` with proxy setup via clerkProxyMiddleware
+- Cookie-based auth for web (no bearer tokens on frontend)
 
-## Key Constraints
+## Data seeded
+- 12 categories, 8 tools (ChatGPT, Claude, Midjourney, GitHub Copilot, DALL-E 3, Runway ML, Notion AI, Perplexity AI)
 
-- `clerkMiddleware` uses `publishableKeyFromHost` — required for multi-domain Clerk proxy support. Do not replace with raw env var.
-- `VITE_CLERK_PROXY_URL` is intentionally empty in dev — proxy is production-only. Do not set it in dev.
-- Clerk "development keys" console warning is expected behavior, not an error.
-- Route `GET /bookmarks/check/:toolId` comes after `DELETE /bookmarks/:toolId` — this is fine because Express matches by both method AND path; they never conflict.
-- The `@clerk/react` peer dep warnings about React 19.1.0 not matching `~19.0.3 || ~19.1.4` are harmless; the library works correctly.
+**Why:** Documenting for future sessions so architecture doesn't need re-discovery.
 
-## Response shapes (critical for `.map()` safety)
-
-- `GET /tools` → `PaginatedTools` `{ tools, total, page, limit }` — access `.tools.map()`
-- `GET /tools/featured|trending|newest|free` → `Tool[]` — direct `.map()`
-- `GET /users/me/submitted-tools` → `Tool[]` — direct `.map()`
-- `GET /bookmarks` → `Bookmark[]` — direct `.map()`
-- `GET /tools/:id/reviews` → `PaginatedReviews` `{ reviews, total, page, limit }` — access `.reviews.map()`
-- `GET /admin/tools` → `PaginatedTools` — access `.tools.map()`
-- `GET /home` → `HomeData` with named arrays (`featuredTools`, `trendingTools`, etc.)
-
-**Why:** Orval generates typed hooks that return the full response shape. Any page that calls `.map()` directly on a paginated response object will get `e?.map is not a function`.
+**How to apply:** When changing routes, schema, or auth — check these files first.
