@@ -1,0 +1,2 @@
+- [AI Hunt Hub stack](ai-hunt-hub-stack.md) — full architecture: Express+Clerk+Drizzle API, React+Vite+Clerk frontend, pnpm monorepo, PostgreSQL
+- [Clerk setup](clerk-setup.md) — Replit-managed Clerk provisioned; dev-key warning in console is expected and harmless
