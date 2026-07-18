@@ -1,0 +1,536 @@
+You are a senior full-stack engineer and premium UI/UX designer.
+
+I want you to upgrade my existing AI Hunt Hub application into a production-ready premium AI marketplace.
+
+IMPORTANT:
+Before changing anything:
+- Analyze the complete codebase.
+- Understand the current architecture.
+- Do not remove existing functionality.
+- Do not rewrite everything unnecessarily.
+- Preserve Clerk authentication.
+- Preserve Supabase/database integration.
+- Preserve existing API routes.
+- Make changes safely and test after each major step.
+
+====================================================
+PHASE 1 — FIX ALL CURRENT FUNCTIONAL ISSUES FIRST
+====================================================
+
+The application currently has multiple runtime problems.
+
+Fix all errors before redesign.
+
+Current errors:
+
+1. React error:
+
+"Uncaught TypeError: e?.map is not a function"
+
+This appears on:
+- Profile page
+- Submitted tools page
+- Tools pages
+- Other pages using API data
+
+
+Find the root cause.
+
+Check:
+- API response format
+- React components expecting arrays
+- React Query hooks
+- TypeScript types
+- Backend serialization
+- Supabase query responses
+
+
+Make sure every frontend component receives the correct data type.
+
+Example protection:
+
+Before:
+
+data.map(...)
+
+
+After:
+
+Array.isArray(data)
+ ? data.map(...)
+ : []
+
+
+But do not only patch the error.
+Fix the actual API/data mismatch.
+
+
+====================================================
+
+2. Fix API response consistency
+
+Review all API endpoints.
+
+Especially:
+
+GET:
+ /users/me/submitted-tools
+
+
+Backend currently:
+
+router.get("/users/me/submitted-tools", requireAuth, async (req,res)=>{
+
+ const user = await getCurrentUser(req);
+
+ if(!user){
+   res.json([]);
+   return;
+ }
+
+ const tools = await db.select()
+ .from(toolsTable)
+ .where(eq(toolsTable.submittedBy,user.clerkUserId));
+
+ res.json(tools.map(t=>serializeTool(t)));
+
+});
+
+
+Verify:
+
+- It always returns an array
+- Empty state returns []
+- Errors return proper JSON
+- Authentication works
+
+
+Standardize all API responses.
+
+
+====================================================
+
+3. Fix Clerk integration
+
+Verify:
+
+- Login works
+- Signup works
+- User session works
+- Profile loads
+- User data sync works
+
+
+Check:
+
+- Clerk publishable key
+- Environment variables
+- Auth middleware
+- User fetching
+
+
+Remove all authentication loading issues.
+
+
+====================================================
+
+4. Fix React Query issues
+
+Review:
+
+useGetMySubmittedTools()
+
+useQuery()
+
+API generated hooks
+
+
+Ensure:
+
+- Loading states work
+- Error states work
+- Data is validated
+- Empty states are beautiful
+
+
+Add proper handling:
+
+loading:
+Skeleton UI
+
+
+error:
+Friendly error message
+
+
+empty:
+"No tools submitted yet"
+
+
+====================================================
+
+5. Fix every page
+
+Test:
+
+/
+Homepage
+
+/tools
+Tool marketplace
+
+/profile
+User profile
+
+/submit
+Submit tool
+
+/admin
+Admin dashboard
+
+
+No blank screens.
+
+No console errors.
+
+No broken routes.
+
+
+====================================================
+PHASE 2 — PREMIUM 3D WEBSITE REDESIGN
+====================================================
+
+Now transform the UI into a premium futuristic AI platform.
+
+Design inspiration:
+
+- Apple Vision Pro
+- Linear
+- Vercel
+- Stripe
+- Product Hunt
+
+
+Create a luxury SaaS feeling.
+
+
+====================================================
+GLOBAL DESIGN SYSTEM
+====================================================
+
+Implement:
+
+- Dark futuristic theme
+- Glassmorphism
+- 3D cards
+- Smooth animations
+- Premium typography
+- Modern spacing
+- Beautiful gradients
+
+
+Use:
+
+- Framer Motion
+- React Three Fiber / Three.js where useful
+
+
+Animations:
+
+- Smooth page transitions
+- Hover effects
+- Floating elements
+- Parallax effects
+
+
+Keep performance high.
+
+
+====================================================
+NEW HOMEPAGE DESIGN
+====================================================
+
+Create a premium hero section.
+
+
+Headline:
+
+"Discover The Future Of Artificial Intelligence"
+
+
+Subtitle:
+
+"Explore thousands of AI tools, compare solutions, and find the perfect AI stack."
+
+
+Buttons:
+
+Explore AI Tools
+
+Submit Your AI Tool
+
+
+Add:
+
+3D AI ecosystem:
+
+Center:
+AI Core / Brain
+
+
+Around it floating categories:
+
+- Writing AI
+- Image AI
+- Video AI
+- Coding AI
+- Marketing AI
+- Productivity AI
+
+
+Add:
+
+- Floating glass cards
+- Particle effects
+- Animated connections
+
+
+====================================================
+AI TOOL MARKETPLACE
+====================================================
+
+Upgrade tool browsing.
+
+
+Features:
+
+Advanced search:
+
+Example:
+
+"Find AI tools for YouTube automation"
+
+
+Filters:
+
+Category:
+- Writing
+- Image
+- Video
+- Audio
+- Coding
+- Marketing
+- Business
+- Productivity
+
+
+Pricing:
+
+- Free
+- Freemium
+- Paid
+
+
+Sorting:
+
+- Trending
+- Latest
+- Popular
+- Highest Rated
+
+
+====================================================
+PREMIUM TOOL CARDS
+====================================================
+
+Redesign cards.
+
+Include:
+
+- Logo
+- Name
+- Description
+- Category
+- Rating
+- Reviews
+- Pricing
+- Trending badge
+- Verified badge
+
+
+Effects:
+
+- 3D tilt
+- Glass background
+- Smooth hover animation
+
+
+====================================================
+PROFILE PAGE
+====================================================
+
+Create premium profile dashboard.
+
+
+Include:
+
+Avatar
+
+Username
+
+AI Explorer Level
+
+
+Stats:
+
+- Submitted Tools
+- Reviews
+- Saved Tools
+- Followers
+
+
+Sections:
+
+My Submitted Tools
+
+Saved Tools
+
+Activity
+
+
+Add beautiful empty states.
+
+
+====================================================
+ADMIN DASHBOARD
+====================================================
+
+Create professional admin dashboard.
+
+
+Include:
+
+Analytics:
+
+Users:
+- Total users
+- Active users
+- Growth
+
+
+Tools:
+- Total tools
+- Pending approval
+- Trending
+
+
+Charts:
+
+- User growth
+- Tool submissions
+- Categories
+
+
+Admin actions:
+
+- Approve tools
+- Delete tools
+- Feature tools
+- Manage users
+
+
+====================================================
+AI FEATURES
+====================================================
+
+Add AI assistant.
+
+
+Floating chatbot:
+
+Capabilities:
+
+- Search AI tools
+- Recommend tools
+- Compare tools
+- Answer questions
+
+
+Example:
+
+User:
+
+"I need AI for creating videos"
+
+
+Assistant:
+
+Returns:
+
+Tool recommendations
+Reasons
+Pricing
+
+
+====================================================
+PERFORMANCE
+====================================================
+
+Optimize:
+
+- Lazy loading
+- Image optimization
+- API caching
+- Pagination
+- Skeleton loaders
+- Code splitting
+
+
+Target:
+
+Fast loading.
+
+No lag.
+
+No console errors.
+
+
+====================================================
+FINAL TESTING
+====================================================
+
+Before completing:
+
+Run full application test.
+
+Verify:
+
+✓ Clerk authentication works
+
+✓ Supabase data loads
+
+✓ Profile works
+
+✓ Submitted tools works
+
+✓ Submit tool works
+
+✓ Admin works
+
+✓ No .map errors
+
+✓ No console errors
+
+✓ Mobile responsive
+
+✓ Production ready
+
+
+At the end provide:
+
+1. List of changed files
+2. Bugs fixed
+3. New features added
+4. Any remaining warnings
+
+Build this like a premium startup product ready for thousands of users.

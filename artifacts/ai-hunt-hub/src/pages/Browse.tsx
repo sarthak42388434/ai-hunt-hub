@@ -1,18 +1,16 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { useListTools, ListToolsParams, ListToolsPricing, ListToolsSort } from "@workspace/api-client-react";
+import { useListTools, ListToolsParams } from "@workspace/api-client-react";
 import { ToolCard } from "@/components/ToolCard";
-import { SectionHeading } from "@/components/SectionHeading";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, SlidersHorizontal, Loader2 } from "lucide-react";
-import { useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { Search, Filter, Loader2, Zap } from "lucide-react";
+import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function Browse() {
-  const [location] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const initialSearch = searchParams.get("search") || "";
   const initialCategory = searchParams.get("category") || "";
@@ -39,123 +37,151 @@ export function Browse() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+      {/* Header Banner */}
+      <div className="bg-muted/20 border-b border-white/5 py-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 gradient-text w-fit">
+            {debouncedSearch ? `Search: "${debouncedSearch}"` : "Browse AI Tools"}
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl font-medium">
+            {data ? `Showing ${data.total} tools across all categories.` : "Discover the perfect AI tool for your needs"}
+          </p>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-8 py-12 flex flex-col lg:flex-row gap-8 lg:gap-12">
         {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 shrink-0 space-y-6">
-          <div className="sticky top-24 space-y-6">
-            <div className="space-y-2">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Filters
-              </h3>
-              <p className="text-xs text-muted-foreground">Refine your search</p>
+        <aside className="w-full lg:w-72 shrink-0 space-y-8">
+          <div className="sticky top-28 glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Filter className="w-4 h-4 text-primary" />
+              </div>
+              <h3 className="font-bold text-lg">Filters</h3>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="search">Search</Label>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="search" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Search</Label>
                 <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     id="search"
                     placeholder="Search tools..." 
-                    className="pl-9"
+                    className="pl-10 bg-background/50 border-white/10 rounded-xl focus-visible:ring-primary h-11"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="sort">Sort By</Label>
+              <div className="space-y-3">
+                <Label htmlFor="sort" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</Label>
                 <Select 
                   id="sort"
                   value={filters.sort || "popular"} 
                   onChange={(e) => handleFilterChange('sort', e.target.value)}
+                  className="bg-background/50 border-white/10 rounded-xl h-11"
                 >
                   <option value="popular">Most Popular</option>
-                  <option value="newest">Newest</option>
+                  <option value="newest">Newest Added</option>
                   <option value="rating">Highest Rated</option>
                   <option value="alphabetical">Alphabetical</option>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="pricing">Pricing</Label>
+              <div className="space-y-3">
+                <Label htmlFor="pricing" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pricing Model</Label>
                 <Select 
                   id="pricing"
                   value={filters.pricing || ""} 
                   onChange={(e) => handleFilterChange('pricing', e.target.value || undefined)}
+                  className="bg-background/50 border-white/10 rounded-xl h-11"
                 >
-                  <option value="">All Pricing</option>
-                  <option value="free">Free</option>
+                  <option value="">Any Pricing</option>
+                  <option value="free">100% Free</option>
                   <option value="freemium">Freemium</option>
                   <option value="paid">Paid</option>
                 </Select>
               </div>
               
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {
-                  setSearch("");
-                  setFilters({ sort: "popular", page: 1, limit: 24 });
-                }}
-              >
-                Clear Filters
-              </Button>
+              <div className="pt-4 border-t border-white/10">
+                <Button 
+                  variant="outline" 
+                  className="w-full rounded-xl border-white/10 hover:bg-white/5"
+                  onClick={() => {
+                    setSearch("");
+                    setFilters({ sort: "popular", page: 1, limit: 24 });
+                  }}
+                >
+                  Reset Filters
+                </Button>
+              </div>
             </div>
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1">
-          <SectionHeading 
-            title={debouncedSearch ? `Search results for "${debouncedSearch}"` : "Browse AI Tools"} 
-            description={data ? `Showing ${data.tools.length} of ${data.total} tools` : "Discover the perfect AI tool for your needs"}
-          />
-
+        <main className="flex-1 min-w-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-32">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <div className="flex flex-col items-center justify-center py-32 space-y-4">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              <span className="text-sm font-bold tracking-widest text-muted-foreground uppercase">Loading Tools</span>
             </div>
           ) : data?.tools && data.tools.length > 0 ? (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {data.tools.map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} />
-                ))}
-              </div>
+            <div className="space-y-12">
+              <motion.div 
+                layout
+                className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+              >
+                <AnimatePresence>
+                  {data.tools.map((tool, i) => (
+                    <motion.div 
+                      key={tool.id}
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: Math.min(i * 0.05, 0.5), duration: 0.4 }}
+                      layout
+                    >
+                      <ToolCard tool={tool} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
               
               {data.total > (filters.page || 1) * (filters.limit || 24) && (
                 <div className="flex justify-center pt-8">
                   <Button 
                     variant="outline" 
+                    size="lg"
+                    className="rounded-full px-8 border-white/10 hover:bg-white/5 font-semibold"
                     onClick={() => handleFilterChange('page', (filters.page || 1) + 1)}
                   >
-                    Load More
+                    Load More Results
                   </Button>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-center py-32 bg-muted/20 rounded-xl border border-dashed">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center py-32 glass-card rounded-3xl text-center px-4 border-dashed border-white/10">
+              <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                <Search className="w-10 h-10 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No tools found</h3>
-              <p className="text-muted-foreground max-w-md mx-auto">
+              <h3 className="text-2xl font-black tracking-tight mb-3">No tools found</h3>
+              <p className="text-muted-foreground max-w-md mx-auto mb-8 text-lg">
                 We couldn't find any tools matching your current filters. Try adjusting your search or clearing some filters.
               </p>
               <Button 
-                variant="outline" 
-                className="mt-6"
+                size="lg"
+                className="rounded-full px-8 glow-primary"
                 onClick={() => {
                   setSearch("");
                   setFilters({ sort: "popular", page: 1, limit: 24 });
                 }}
               >
-                Clear Filters
+                Clear All Filters
               </Button>
             </div>
           )}

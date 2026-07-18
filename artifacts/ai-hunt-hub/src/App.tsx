@@ -119,7 +119,16 @@ function App() {
                 theme: shadcn,
                 cssLayerName: "clerk",
                 variables: {
-                  colorPrimary: "hsl(244 76% 59%)",
+                  colorPrimary: "hsl(244, 76%, 59%)",
+                  colorBackground: "hsl(222, 47%, 6%)",
+                  colorForeground: "hsl(210, 40%, 96%)",
+                  colorMutedForeground: "hsl(215, 20%, 50%)",
+                  colorInput: "hsl(217, 33%, 17%)",
+                  colorInputForeground: "hsl(210, 40%, 96%)",
+                  colorNeutral: "hsl(217, 33%, 17%)",
+                  colorDanger: "hsl(0, 72%, 51%)",
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  borderRadius: "0.75rem",
                 }
               }}
             >
