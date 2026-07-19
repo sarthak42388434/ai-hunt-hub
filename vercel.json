@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm --filter @workspace/ai-hunt-hub run build",
-  "outputDirectory": "artifacts/ai-hunt-hub/dist/public",
+  "outputDirectory": "artifacts/ai-hunt-hub/dist",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
