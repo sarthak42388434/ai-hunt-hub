@@ -46,6 +46,14 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
+    sourcemap: false,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress sourcemap warnings from third-party UI components
+        if (warning.code === 'SOURCEMAP_ERROR') return;
+        warn(warning);
+      },
+    },
   },
   server: {
     port,
