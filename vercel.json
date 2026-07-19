@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "pnpm install && pnpm --filter @workspace/ai-hunt-hub run build && cp -r artifacts/ai-hunt-hub/dist public",
   "outputDirectory": "public",
   "installCommand": "pnpm install",
   "framework": null,
